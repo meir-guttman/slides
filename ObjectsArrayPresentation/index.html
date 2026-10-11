@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערך של עצמים ב-Java</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: #090d16;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .deck-container {
+      width: 90vw;
+      max-width: 1000px;
+      height: 75vh;
+      max-height: 650px;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 35px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease-in-out;
+      transform: translateY(10px);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .slide-header {
+      border-bottom: 2px solid #334155;
+      padding-bottom: 10px;
+    }
+
+    .slide-title {
+      font-size: 1.8rem;
+      color: var(--accent-blue);
+    }
+
+    .slide-content {
+      flex: 1;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    /* Code styling */
+    pre {
+      background-color: var(--code-bg);
+      border-radius: 8px;
+      padding: 14px 18px;
+      direction: ltr;
+      text-align: left;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      overflow-x: auto;
+    }
+
+    .keyword { color: #f43f5e; font-weight: bold; }
+    .type { color: #38bdf8; }
+    .string { color: #4ade80; }
+    .comment { color: #94a3b8; font-style: italic; }
+    .op { color: #f59e0b; }
+
+    /* Lists & Highlights */
+    ul {
+      list-style-type: none;
+      padding-right: 10px;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-right: 24px;
+    }
+
+    ul li::before {
+      content: "•";
+      color: var(--accent-blue);
+      font-size: 1.4rem;
+      position: absolute;
+      right: 0;
+      top: -4px;
+    }
+
+    .badge {
+      background: #334155;
+      color: var(--accent-purple);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .exercise-box {
+      background-color: var(--code-bg);
+      border-right: 4px solid var(--accent-green);
+      padding: 14px 18px;
+      margin-top: 10px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .exercise-title {
+      color: var(--accent-green);
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90vw;
+      max-width: 1000px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid #334155;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #334155;
+      color: var(--accent-blue);
+    }
+
+    .slide-counter {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+
+    <!-- Slide 1: Introduction & Need -->
+    <div class="slide active">
+      <div class="slide-header">
+        <h2 class="slide-title">1. למה אנחנו צריכים מערך של עצמים?</h2>
+      </div>
+      <div class="slide-content">
+        <p style="margin-bottom: 12px;"><b>התרחיש:</b> אנחנו בונים מערכת לבית הספר וצריכים לשמור נתונים עבור 100 תלמידים.</p>
+        <ul>
+          <li>עד כה למדנו ליצור עצם יחיד: <span class="badge">Student s = new Student(...);</span></li>
+          <li>יצירת 100 משתנים נפרדים (<span class="badge">s1, s2, s3...</span>) היא בלתי אפשרית!</li>
+          <li><b>הפתרון:</b> בדיוק כמו שאוספים מספרים לתוך <span class="badge">int[]</span>, ניתן לאסוף עצמים לתוך מערך מסוג המחלקה: <span class="badge">Student[]</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 2: Memory & Null Trap -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">2. איך מערך עצמים עובד בזיכרון? (דו-שלביות)</h2>
+      </div>
+      <div class="slide-content">
+        <p style="margin-bottom: 8px;"><b>שלב א': הקצאת ה"מדף" (המערך)</b></p>
+        <pre><code>Student[] arr = <span class="keyword">new</span> Student[<span class="string">3</span>];</code></pre>
+        <p style="margin-top: 6px; font-size: 0.95rem; color: var(--accent-blue);">בשלב זה נוצר מערך בגודל 3, אך כל התאים מכילים <span class="badge">null</span> (אין עדיין עצמים!).</p>
+        
+        <br>
+        <p style="margin-bottom: 8px;"><b>שלב ב': יצירת העצמים לתוך התאים</b></p>
+        <pre><code>arr[<span class="string">0</span>] = <span class="keyword">new</span> Student(<span class="string">"Dan"</span>, <span class="string">85.5</span>);
+arr[<span class="string">1</span>] = <span class="keyword">new</span> Student(<span class="string">"Dana"</span>, <span class="string">92.0</span>);</code></pre>
+
+        <div style="background: #334155; padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 0.95rem;">
+          ⚠️ <b>אזהרת NullPointerException:</b> פנייה לתא במערך לפני שנוצר בו עצם (למשל <span class="badge">arr[2].getGrade()</span>) תגרום לקריסת התוכנית!
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Implementation Part 1 - Student Class -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">3. מימוש: המחלקה Student</h2>
+      </div>
+      <div class="slide-content">
+        <pre><code><span class="keyword">public class</span> Student {
+    <span class="keyword">private</span> String name;
+    <span class="keyword">private double</span> grade;
+
+    <span class="comment">// פעולה בונה (Constructor)</span>
+    <span class="keyword">public</span> Student(String name, <span class="type">double</span> grade) {
+        <span class="keyword">this</span>.name = name;
+        <span class="keyword">this</span>.grade = grade;
+    }
+
+    <span class="comment">// פעולות מאחזרות (Getters)</span>
+    <span class="keyword">public double</span> getGrade() { <span class="keyword">return this</span>.grade; }
+    <span class="keyword">public</span> String getName() { <span class="keyword">return this</span>.name; }
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Slide 4: Implementation Part 2 - Main Class Manual Initialization -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">4. מימוש: מחלקה ראשית (אתחול ידני וסריקה)</h2>
+      </div>
+      <div class="slide-content">
+        <pre><code><span class="keyword">public class</span> Main {
+    <span class="keyword">public static void</span> main(String[] args) {
+        Student[] classGrades = <span class="keyword">new</span> Student[<span class="string">3</span>]; <span class="comment">// הקצאת המערך</span>
+
+        <span class="comment">// אכלוס פרטני של העצמים</span>
+        classGrades[<span class="string">0</span>] = <span class="keyword">new</span> Student(<span class="string">"Dan"</span>, <span class="string">85.0</span>);
+        classGrades[<span class="string">1</span>] = <span class="keyword">new</span> Student(<span class="string">"Dana"</span>, <span class="string">95.0</span>);
+        classGrades[<span class="string">2</span>] = <span class="keyword">new</span> Student(<span class="string">"Gal"</span>, <span class="string">90.0</span>);
+
+        <span class="comment">// סריקת המערך וחישוב סכום הציונים</span>
+        <span class="type">double</span> sum = <span class="string">0</span>;
+        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i &lt; classGrades.length; i++) {
+            sum += classGrades[i].getGrade(); <span class="comment">// גישה לתא i</span>
+        }
+        System.out.println(<span class="string">"Average: "</span> + (sum / classGrades.length));
+    }
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Slide 5: Loop Initialization -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">5. מימוש: אתחול המערך בלולאה (עם קלט)</h2>
+      </div>
+      <div class="slide-content">
+        <pre><code>Scanner in = <span class="keyword">new</span> Scanner(System.in);
+Student[] students = <span class="keyword">new</span> Student[<span class="string">5</span>]; <span class="comment">// מערך ל-5 תלמידים</span>
+
+<span class="comment">// קליטת נתונים ויצירת עצם בכל סיבוב של הלולאה</span>
+<span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i &lt; students.length; i++) {
+    System.out.println(<span class="string">"Enter name and grade:"</span>);
+    String name = in.next();
+    <span class="type">double</span> grade = in.nextDouble();
+    
+    <span class="comment">// יצירת העצם והשמתו בתא הנוכחי במערך</span>
+    students[i] = <span class="keyword">new</span> Student(name, grade);
+}</code></pre>
+        <p style="margin-top: 10px; font-size: 0.95rem;"><b>שים לב:</b> בכל סיבוב בלולאה נקרא ה-Constructor <span class="badge">new Student(...)</span> ומכניס עצם חדש לתא ה-i.</p>
+      </div>
+    </div>
+
+    <!-- Slide 6: Summary & Exercise -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">6. סיכום ותתרגיל כיתה</h2>
+      </div>
+      <div class="slide-content">
+        <ul>
+          <li><b>הגדרת מערך:</b> <span class="badge">ClassName[] arr = new ClassName[size];</span></li>
+          <li><b>יצירת עצם בתא:</b> <span class="badge">arr[i] = new ClassName(...);</span></li>
+          <li><b>פנייה למתודה:</b> <span class="badge">arr[i].methodName()</span></li>
+        </ul>
+
+        <div class="exercise-box">
+          <div class="exercise-title">תרגיל כיתה מיידי:</div>
+          1. צרו מערך של 4 תלמידים (<span class="badge">Student[]</span>) ואכלסו אותם בנתונים.<br>
+          2. סרקו את המערך ומצאו והדפיסו את שמו של התלמיד בעל <b>הציון הגבוה ביותר</b> בכיתה.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">❮ הקודם</button>
+    <span class="slide-counter" id="counter">שקף 1 מתוך 6</span>
+    <button class="btn" id="nextBtn" onclick="changeSlide(1)">הבא ❯</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      counter.textContent = `שקף ${currentSlide + 1} מתוך ${slides.length}`;
+    }
+
+    function changeSlide(direction) {
+      currentSlide = (currentSlide + direction + slides.length) % slides.length;
+      updateSlides();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        changeSlide(1); // RTL direction layout
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        changeSlide(-1);
+      }
+    });
+  </script>
+</body>
+</html>
