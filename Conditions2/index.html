@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תנאים בשפת Java - if / else</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: #090d16;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .deck-container {
+      width: 90vw;
+      max-width: 1000px;
+      height: 70vh;
+      max-height: 600px;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease-in-out;
+      transform: translateY(10px);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .slide-header {
+      border-bottom: 2px solid #334155;
+      padding-bottom: 12px;
+    }
+
+    .slide-title {
+      font-size: 2rem;
+      color: var(--accent-blue);
+    }
+
+    .slide-content {
+      flex: 1;
+      margin-top: 20px;
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+
+    /* Code styling */
+    pre {
+      background-color: var(--code-bg);
+      border-radius: 8px;
+      padding: 16px;
+      direction: ltr;
+      text-align: left;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      overflow-x: auto;
+    }
+
+    .keyword { color: #f43f5e; font-weight: bold; }
+    .type { color: #38bdf8; }
+    .string { color: #4ade80; }
+    .comment { color: #94a3b8; font-style: italic; } /* צבע אפור בהיר וקריא */
+    .op { color: #f59e0b; }
+
+    /* Lists & Highlights */
+    ul {
+      list-style-type: none;
+      padding-right: 10px;
+    }
+
+    ul li {
+      margin-bottom: 12px;
+      position: relative;
+      padding-right: 24px;
+    }
+
+    ul li::before {
+      content: "•";
+      color: var(--accent-blue);
+      font-size: 1.5rem;
+      position: absolute;
+      right: 0;
+      top: -4px;
+    }
+
+    .badge {
+      background: #334155;
+      color: var(--accent-purple);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .exercise-box {
+      background-color: var(--code-bg);
+      border-right: 4px solid var(--accent-green);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .exercise-title {
+      color: var(--accent-green);
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90vw;
+      max-width: 1000px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid #334155;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #334155;
+      color: var(--accent-blue);
+    }
+
+    .slide-counter {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+
+    <!-- Slide 1: Syntax & Structure -->
+    <div class="slide active">
+      <div class="slide-header">
+        <h2 class="slide-title">1. המבנה והתחביר של משפט תנאי (if)</h2>
+      </div>
+      <div class="slide-content">
+        <pre><code><span class="keyword">if</span> (condition) {
+    <span class="comment">// קוד שיבוצע רק אם התנאי אמת (true)</span>
+} <span class="keyword">else</span> {
+    <span class="comment">// קוד שיבוצע רק אם התנאי שקר (false)</span>
+}</code></pre>
+        <br>
+        <ul>
+          <li><b>סוגריים עגולים <span class="badge">()</span>:</b> מכילים ביטוי בוליאני שתוצאתו היא <span class="badge">true</span> או <span class="badge">false</span>.</li>
+          <li><b>סוגריים מסולסלים <span class="badge">{}</span>:</b> מגדירים בלוק קוד לכל מסלול ביצוע.</li>
+          <li><b>אופרטורים להשוואה:</b> 
+            <span class="badge">==</span> (השוואה), 
+            <span class="badge">!=</span> (שונה מ-), 
+            <span class="badge">&gt;</span>, 
+            <span class="badge">&lt;</span>, 
+            <span class="badge">&gt;=</span>, 
+            <span class="badge">&lt;=</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 2: Driving Example -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">2. דוגמה ראשונה: זכאות לרישיון נהיגה</h2>
+      </div>
+      <div class="slide-content">
+        <pre><code>Scanner in = <span class="keyword">new</span> Scanner(System.in);
+System.out.println(<span class="string">"Enter your age:"</span>);
+<span class="type">double</span> age = in.nextDouble();
+
+<span class="keyword">if</span> (age &gt;= <span class="string">16.5</span>) {
+    System.out.println(<span class="string">"You can start driving lessons!"</span>);
+} <span class="keyword">else</span> {
+    System.out.println(<span class="string">"You are too young."</span>);
+}</code></pre>
+        <br>
+        <p><b>שימו לב:</b> המחשב יבחן את הביטוי <span class="badge">age >= 16.5</span>. רק אחד משני הבלוקים יבוצע!</p>
+      </div>
+    </div>
+
+    <!-- Slide 3: Even/Odd Check -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">3. חיבור לידע מוקדם: בדיקת זוגיות במספר</h2>
+      </div>
+      <div class="slide-content">
+        <p style="margin-bottom: 10px;">שימוש באופרטור מודולו (<span class="badge">%</span>) כדי לבדוק אם המספר עצמו זוגי:</p>
+        <pre><code>Scanner in = <span class="keyword">new</span> Scanner(System.in);
+System.out.println(<span class="string">"Enter a number:"</span>);
+<span class="type">int</span> num = in.nextInt();
+
+<span class="keyword">if</span> (num % <span class="string">2</span> == <span class="string">0</span>) {
+    System.out.println(<span class="string">"The number is EVEN."</span>);
+} <span class="keyword">else</span> {
+    System.out.println(<span class="string">"The number is ODD."</span>);
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Slide 4: Tens Digit Even Check -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">4. פירוק מספר: בדיקת זוגיות ספרת העשרות</h2>
+      </div>
+      <div class="slide-content">
+        <p style="margin-bottom: 10px;">שילוב חילוק שלם (<span class="badge">/</span>) ומודולו (<span class="badge">%</span>) לחילוץ ובדיקת ספרת העשרות:</p>
+        <pre><code>Scanner in = <span class="keyword">new</span> Scanner(System.in);
+System.out.println(<span class="string">"Enter a two-digit number:"</span>);
+<span class="type">int</span> num = in.nextInt();
+
+<span class="type">int</span> tens = num / <span class="string">10</span>; <span class="comment">// חילוץ ספרת העשרות</span>
+
+<span class="keyword">if</span> (tens % <span class="string">2</span> == <span class="string">0</span>) {
+    System.out.println(<span class="string">"The tens digit is EVEN."</span>);
+} <span class="keyword">else</span> {
+    System.out.println(<span class="string">"The tens digit is ODD."</span>);
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Slide 5: Summary -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">5. סיכום נקודות מפתח</h2>
+      </div>
+      <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+        <div style="background: #334155; padding: 15px; border-radius: 8px;">
+          🧠 <b>קבלת החלטות:</b> התנאי הופך את התוכנית מצינור פשוט למוח שמגיב לקלט באופן שונה.
+        </div>
+        <div style="background: #334155; padding: 15px; border-radius: 8px;">
+          ⚠️ <b>טעות נפוצה:</b> המופע <span class="badge">=</span> משמש ל<b>השמה</b> (הכנסת ערך למשתנה). השוואה מתבצעת בעזרת <span class="badge">==</span>!
+        </div>
+        <div style="background: #334155; padding: 15px; border-radius: 8px;">
+          חלקי ה-<b>else</b> אינם חובה – משתמשים בהם רק כאשר יש פעולה חלופית לביצוע.
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Classroom Exercises -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2 class="slide-title">6. תרגילים להתחלת עבודה</h2>
+      </div>
+      <div class="slide-content">
+
+        <div class="exercise-box">
+          <div class="exercise-title">תרגיל 1: בדיקת זוגיות במספר</div>
+          קלוט מספר שלם מהמשתמש.<br>
+          אם המספר זוגי, הדפס: <span class="badge">The number is even</span>. אחרת, הדפס: <span class="badge">The number is odd</span>.
+        </div>
+
+        <div class="exercise-box">
+          <div class="exercise-title">תרגיל 2: בדיקת סימן המספר (חיובי / שלילי)</div>
+          קלוט מספר שלם מהמשתמש.<br>
+          אם המספר חיובי, הדפס: <span class="badge">is positive</span>.<br>
+          אם המספר שלילי, הדפס: <span class="badge">is negative</span>.<br>
+          אם המספר הוא 0, <b>אין להדפיס דבר</b>.
+        </div>
+
+        <div class="exercise-box">
+          <div class="exercise-title">תרגיל 3: מספר דו-ספרתי מעניין</div>
+          קלוט מספר שלם דו-ספרתי.<br>
+          אם שתי הספרות שלו זהות, הדפס: <span class="badge">nice</span>.<br>
+          אם הספרות שונות, הדפס: <span class="badge">not nice</span>.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">❮ הקודם</button>
+    <span class="slide-counter" id="counter">שקף 1 מתוך 6</span>
+    <button class="btn" id="nextBtn" onclick="changeSlide(1)">הבא ❯</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      counter.textContent = `שקף ${currentSlide + 1} מתוך ${slides.length}`;
+    }
+
+    function changeSlide(direction) {
+      currentSlide = (currentSlide + direction + slides.length) % slides.length;
+      updateSlides();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        changeSlide(1); // RTL direction layout
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        changeSlide(-1);
+      }
+    });
+  </script>
+</body>
+</html>
