@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מצגת לימודית: המחלקות Math ו-Random ב-Java</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Heebo & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Highlight.js for Java Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow: hidden;
+            user-select: none;
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+        .slide-container {
+            transition: transform 0.2s ease-out;
+            transform-origin: center center;
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* Custom scrollbar for code blocks inside slides */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between bg-slate-100 text-slate-900 select-none">
+
+    <!-- Top Navigation Bar / Controls -->
+    <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shadow-sm z-20">
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-lg flex items-center justify-center w-9 h-9">
+                J
+            </div>
+            <div>
+                <h1 class="font-bold text-slate-800 text-lg leading-tight">מדעי המחשב - כיתה י'</h1>
+                <p class="text-xs text-slate-500 font-medium">שיעור: המחלקות Math ו-Random</p>
+            </div>
+        </div>
+
+        <!-- Zoom Controls for Teacher -->
+        <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200 space-x-1 space-x-reverse">
+            <span class="text-xs font-semibold text-slate-600 px-2 flex items-center gap-1">
+                <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> זום:
+            </span>
+            <button onclick="changeZoom(-0.1)" title="הקטן תצוגה (-)" class="p-1.5 hover:bg-white rounded-lg transition-colors text-slate-700 shadow-sm border border-transparent hover:border-slate-200 active:bg-slate-200">
+                <i data-lucide="minus" class="w-4 h-4"></i>
+            </button>
+            <button onclick="resetZoom()" title="איפוס זום (100%)" class="px-2.5 py-1 text-xs font-bold hover:bg-white rounded-lg transition-colors text-slate-700 shadow-sm border border-transparent hover:border-slate-200 active:bg-slate-200" id="zoom-indicator">
+                100%
+            </button>
+            <button onclick="changeZoom(0.1)" title="הגדל תצוגה (+)" class="p-1.5 hover:bg-white rounded-lg transition-colors text-slate-700 shadow-sm border border-transparent hover:border-slate-200 active:bg-slate-200">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Slide Indicator -->
+        <div class="flex items-center space-x-2 space-x-reverse">
+            <span class="text-sm font-semibold text-slate-500">שקופית</span>
+            <span id="slide-counter" class="text-base font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">1 / 5</span>
+        </div>
+    </header>
+
+    <!-- Main Content Presentation Viewport -->
+    <main class="flex-1 overflow-hidden relative flex items-center justify-center p-4 md:p-8">
+        <div id="slide-container" class="slide-container w-full h-full max-w-6xl max-h-[800px] bg-white rounded-2xl border border-slate-200 shadow-xl p-8 md:p-12 relative flex flex-col justify-between">
+            
+            <!-- Slide 1: Title -->
+            <section class="slide active flex-col justify-center items-center text-center h-full space-y-8">
+                <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-base font-semibold border border-blue-200">
+                    <i data-lucide="code" class="w-5 h-5"></i> שפת Java • כיתה י'
+                </div>
+                <h1 class="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+                    המחלקות <span class="text-blue-600">Math</span> ו-<span class="text-emerald-600">Random</span>
+                </h1>
+                <p class="text-2xl text-slate-600 max-w-2xl font-light leading-relaxed">
+                    הרחבת ארגז הכלים ב-Java: חישובים מתמטיים מתקדמים והגרלת מספרים אקראיים.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl pt-6 text-right">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex gap-4 items-start">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg flex-shrink-0">
+                            <i data-lucide="calculator" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">המחלקה Math</h3>
+                            <p class="text-slate-600 text-sm mt-1">ביצוע פעולות מתמטיות כמו חזקה, שורש, ערך מוחלט ומקסימום/מינימום.</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex gap-4 items-start">
+                        <div class="bg-emerald-100 text-emerald-600 p-3 rounded-lg flex-shrink-0">
+                            <i data-lucide="dices" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">המחלקה Random</h3>
+                            <p class="text-slate-600 text-sm mt-1">ייצור ומניפולציה של מספרים אקראיים למשחקים ולסימולציות.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: Math Class -->
+            <section class="slide flex-col justify-start h-full space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-blue-600 font-bold text-sm tracking-wide uppercase">חלק 1</span>
+                        <h2 class="text-3xl font-bold text-slate-900">המחלקה Math - חישובים מתמטיים</h2>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">ללא צורך ב-new</span>
+                </div>
+
+                <p class="text-lg text-slate-700 leading-relaxed">
+                    המחלקה <code class="bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-semibold">Math</code> מספקת לנו פונקציות מתמטיות מוכנות. 
+                    <strong class="text-slate-900">אין צורך ליצור ממנה אובייקט!</strong> משתמשים בה ישירות דרך שם המחלקה.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto custom-scrollbar p-1">
+                    
+                    <!-- Math.abs -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <code class="text-lg font-bold text-blue-700">Math.abs(x)</code>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded">ערך מוחלט</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-2">מחזירה את הערך החיובי של המספר (מרחק מאפס).</p>
+                        <pre><code class="language-java text-xs rounded-lg p-2">Math.abs(-5); // מחזיר 5
+Math.abs(3);  // מחזיר 3</code></pre>
+                    </div>
+
+                    <!-- Math.pow -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <code class="text-lg font-bold text-blue-700">Math.pow(base, exp)</code>
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">מחזיר double</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-2">מחזירה בסיס בחזקת מעריך ($base^{exp}$).</p>
+                        <pre><code class="language-java text-xs rounded-lg p-2">Math.pow(2, 3); // מחזיר 8.0
+Math.pow(5, 2); // מחזיר 25.0</code></pre>
+                    </div>
+
+                    <!-- Math.sqrt -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <code class="text-lg font-bold text-blue-700">Math.sqrt(x)</code>
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">מחזיר double</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-2">מחזירה את השורש הריבועי של $x$.</p>
+                        <pre><code class="language-java text-xs rounded-lg p-2">Math.sqrt(16); // מחזיר 4.0
+Math.sqrt(9);  // מחזיר 3.0</code></pre>
+                    </div>
+
+                    <!-- Math.max / Math.min -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <code class="text-lg font-bold text-blue-700">Math.max(a, b) / min</code>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded">מקסימום / מינימום</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-2">מחזירה את הערך הגדול או הקטן מבין שניים.</p>
+                        <pre><code class="language-java text-xs rounded-lg p-2">Math.max(10, 20); // מחזיר 20
+Math.min(4, 8);   // מחזיר 4</code></pre>
+                    </div>
+
+                </div>
+
+                <div class="bg-amber-50 border-r-4 border-amber-500 p-3 rounded-l-xl text-sm text-amber-900 flex items-center gap-3">
+                    <i data-lucide="info" class="w-5 h-5 flex-shrink-0 text-amber-600"></i>
+                    <span><strong>לתשומת לבכם:</strong> בתוך המחלקה <code>Math</code> קיימת גם <code>Math.random()</code>, אך אנו נלמד לעבוד עם המחלקה הייעודית <strong>Random</strong> שהיא נוחה וגמישה בהרבה!</span>
+                </div>
+            </section>
+
+            <!-- Slide 3: Random Class -->
+            <section class="slide flex-col justify-start h-full space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-emerald-600 font-bold text-sm tracking-wide uppercase">חלק 2</span>
+                        <h2 class="text-3xl font-bold text-slate-900">המחלקה Random - הגרלת מספרים</h2>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">נדרש import ו-new</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <div class="text-emerald-700 font-bold text-sm mb-1">שלב 1: ייבוא (Import)</div>
+                            <p class="text-xs text-slate-600 mb-2">ייבוא המחלקה מתוך ספריית הכלים של Java.</p>
+                        </div>
+                        <pre><code class="language-java text-xs rounded-lg p-2">import java.util.Random;</code></pre>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <div class="text-emerald-700 font-bold text-sm mb-1">שלב 2: יצירת אובייקט</div>
+                            <p class="text-xs text-slate-600 mb-2">יצירת משתנה מסוג Random בעזרת new.</p>
+                        </div>
+                        <pre><code class="language-java text-xs rounded-lg p-2">Random rnd = new Random();</code></pre>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <div class="text-emerald-700 font-bold text-sm mb-1">שלב 3: הגרלת מספר</div>
+                            <p class="text-xs text-slate-600 mb-2">שימוש במתודה <code>nextInt(n)</code>.</p>
+                        </div>
+                        <pre><code class="language-java text-xs rounded-lg p-2">int val = rnd.nextInt(10);</code></pre>
+                    </div>
+                </div>
+
+                <!-- Range Rule Explanation -->
+                <div class="bg-slate-50 border border-slate-200 p-5 rounded-xl space-y-3">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                        <i data-lucide="target" class="w-5 h-5 text-emerald-600"></i>
+                        כלל התחום של <code>rnd.nextInt(n)</code>
+                    </h3>
+                    <p class="text-base text-slate-700">
+                        הפעולה <code class="font-bold text-emerald-700">rnd.nextInt(n)</code> מחזירה מספר שלם אקראי בתחום: 
+                        <strong class="bg-slate-200 px-2 py-1 rounded text-slate-900">0 עד n - 1</strong> (כולל 0, לא כולל n).
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-white p-3.5 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-sm text-slate-800 block mb-1">🎯 הגרלה בין 1 ל-4 (כמו במשחק שלנו):</span>
+                            <pre class="mb-1"><code class="language-java text-xs p-2 rounded">int num = rnd.nextInt(4) + 1;</code></pre>
+                            <span class="text-xs text-slate-500">יוצר מספר מ-0 עד 3, והוספת 1 מעבירה את התחום ל: <strong>1 עד 4</strong>.</span>
+                        </div>
+
+                        <div class="bg-white p-3.5 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-sm text-slate-800 block mb-1">🎲 הגרלת קוביית משחק (1 עד 6):</span>
+                            <pre class="mb-1"><code class="language-java text-xs p-2 rounded">int die = rnd.nextInt(6) + 1;</code></pre>
+                            <span class="text-xs text-slate-500">יוצר מספר מ-0 עד 5, והוספת 1 מעבירה את התחום ל: <strong>1 עד 6</strong>.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Java Code Example -->
+            <section class="slide flex-col justify-start h-full space-y-4">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <span class="text-purple-600 font-bold text-xs tracking-wide uppercase">דוגמה מסכמת</span>
+                        <h2 class="text-2xl font-bold text-slate-900">משחק ניחוש מספרים וחישובים מתמטיים</h2>
+                    </div>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">Java Code</span>
+                </div>
+
+                <div class="bg-slate-900 text-slate-100 rounded-xl p-4 overflow-hidden border border-slate-800 flex-1 flex flex-col justify-between shadow-inner">
+                    <pre class="overflow-y-auto custom-scrollbar flex-1 text-xs md:text-sm leading-relaxed"><code class="language-java">import java.util.Scanner;
+import java.util.Random;
+
+public class NumberGame {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Random rnd = new Random();
+
+        // 1. הגרלת מספר סודי בין 1 ל-4
+        int secretNum = rnd.nextInt(4) + 1;
+
+        System.out.print("נחש מספר בין 1 ל-4: ");
+        int guess = scanner.nextInt();
+
+        // 2. בדיקת הניחוש בעזרת תנאי
+        if (guess == secretNum) {
+            System.out.println("כל הכבוד! ניחשת נכון!");
+            
+            // שימוש ב-Math במקרה של הצלחה
+            System.out.println("המספר בריבוע: " + Math.pow(secretNum, 2));
+            System.out.println("המספר בחזקת 4: " + Math.pow(secretNum, 4));
+            System.out.println("השורש הריבועי: " + Math.sqrt(secretNum));
+        } else {
+            System.out.println("טעית! המספר הנכון היה: " + secretNum);
+            
+            // מתן רמז: האם המספר הסודי היה גדול או קטן מהניחוש
+            if (secretNum > guess) {
+                System.out.println("המספר הסודי היה גדול יותר מהניחוש שלך.");
+            } else {
+                System.out.println("המספר הסודי היה קטן יותר מהניחוש שלך.");
+            }
+        }
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 5: Class Practice -->
+            <section class="slide flex-col justify-start h-full space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-blue-600 font-bold text-sm tracking-wide uppercase">משימת סיכום</span>
+                        <h2 class="text-3xl font-bold text-slate-900">תרגול כיתה / עבודת בית</h2>
+                    </div>
+                    <i data-lucide="edit-3" class="w-7 h-7 text-blue-600"></i>
+                </div>
+
+                <div class="bg-blue-50/60 border border-blue-200 p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xl font-bold text-blue-900 flex items-center gap-2">
+                        <i data-lucide="award" class="w-6 h-6 text-blue-600"></i> תרגיל: תחרות זריקת קוביות
+                    </h3>
+                    <p class="text-slate-700 text-lg leading-relaxed">
+                        כתבו תוכנית ב-Java המדמה סיבוב משחק בין המחשב לשחקן:
+                    </p>
+                    <ol class="list-decimal list-inside text-slate-800 text-base space-y-3 font-medium bg-white p-4 rounded-xl border border-blue-100">
+                        <li>הגרילו קוביית משחק (מספר בין 1 ל-6) עבור <strong class="text-blue-700">השחקן</strong>.</li>
+                        <li>הגרילו קוביית משחק (מספר בין 1 ל-6) עבור <strong class="text-emerald-700">המחשב</strong>.</li>
+                        <li>הדפיסו את התוצאה של כל אחד מהצדדים.</li>
+                        <li>השתמשו ב-<code class="bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-bold">Math.max</code> כדי למצוא ולהדפיס את התוצאה הגבוהה ביותר מבין השניים.</li>
+                        <li>השתמשו ב-<code class="bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-bold">Math.abs</code> כדי לחשב ולהדפיס את הפרש הנקודות החיובי ביניהם.</li>
+                    </ol>
+                </div>
+
+                <!-- Pro tip box -->
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center gap-3 text-emerald-900 text-sm">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-emerald-600 flex-shrink-0"></i>
+                    <span><strong>אתגר למתקדמים:</strong> הוסיפו תנאי לבדיקת תיקו בין השחקן למחשב!</span>
+                </div>
+            </section>
+
+            <!-- Bottom Control Footer -->
+            <footer class="pt-4 border-t border-slate-100 flex items-center justify-between text-slate-600">
+                <button id="prev-btn" onclick="prevSlide()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 font-bold rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i> הקודם
+                </button>
+
+                <div class="text-xs text-slate-400 font-medium hidden md:block">
+                    טיפ למורה: ניתן לעבור שקופיות גם עם החצים במקלדת (Right / Left)
+                </div>
+
+                <button id="next-btn" onclick="nextSlide()" class="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 disabled:opacity-30 disabled:cursor-not-allowed">
+                    הבא <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Presentation State
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let zoomLevel = 1.0;
+
+        // UI Elements
+        const slideCounter = document.getElementById('slide-counter');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideContainer = document.getElementById('slide-container');
+        const zoomIndicator = document.getElementById('zoom-indicator');
+
+        // Initialize Highlight.js & Lucide Icons
+        document.addEventListener('DOMContentLoaded', () => {
+            hljs.highlightAll();
+            lucide.createIcons();
+            updateSlideView();
+        });
+
+        // Navigation Functions
+        function updateSlideView() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update Slide Counter
+            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            // Button States
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlideView();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideView();
+            }
+        }
+
+        // Zoom Functions for Teacher Control
+        function changeZoom(delta) {
+            zoomLevel = Math.max(0.7, Math.min(1.5, zoomLevel + delta));
+            applyZoom();
+        }
+
+        function resetZoom() {
+            zoomLevel = 1.0;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            slideContainer.style.transform = `scale(${zoomLevel})`;
+            zoomIndicator.textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        // Keyboard Controls Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                // In RTL, ArrowLeft moves forward to next slide
+                nextSlide();
+            } else if (e.key === 'ArrowRight') {
+                // In RTL, ArrowRight moves backward to previous slide
+                prevSlide();
+            } else if (e.key === '+' || e.key === '=') {
+                changeZoom(0.1);
+            } else if (e.key === '-') {
+                changeZoom(-0.1);
+            } else if (e.key === '0') {
+                resetZoom();
+            }
+        });
+    </script>
+</body>
+</html>
